@@ -63,7 +63,7 @@ func (c *Controller) Run(stop <-chan struct{}) {
 	go c.informerFactory.Start(stop)
 
 	<-stop
-	c.logger.Info("Stopping Agones Controller")
+	c.logger.Info("Stopping GameServer Controller")
 }
 
 func (c *Controller) EventHandlerGameServerAdd(obj interface{}) error {

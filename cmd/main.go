@@ -24,7 +24,7 @@ func main() {
 
 	logger := NewLoggerWithLevel(loglevel)
 
-	logger.Debug("Starting Agones Controller")
+	logger.Debug("Starting GameServer Controller")
 
 	// The account from the Kubeconfig must have the right RBAC configurations.
 	// TODO provide examples of RBAC or point to Agones Docs
@@ -49,7 +49,7 @@ func main() {
 
 	agonesController.Run(stop)
 
-	logger.Info("Agones Controller Terminated")
+	logger.Info("GameServer Controller Terminated")
 }
 
 func NewLoggerWithLevel(level logrus.Level) *logrus.Entry {

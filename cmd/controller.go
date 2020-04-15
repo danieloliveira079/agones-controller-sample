@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/danieloliveira079/agones-controller-sample/internal/version"
-	"github.com/danieloliveira079/agones-controller-sample/pkg/controller"
+	"github.com/danieloliveira079/agones-controller-sample/pkg/controllers"
 	"github.com/danieloliveira079/agones-controller-sample/pkg/log"
 	"github.com/danieloliveira079/agones-controller-sample/pkg/signals"
 	"github.com/sirupsen/logrus"
@@ -44,14 +44,13 @@ func main() {
 	}
 
 	// Instantiates the new agones controller passing the logger and the clientSet to be used by the informer
-	agonesController, err := controller.NewAgonesController(logger, agonesClientSet)
+	gameServerController, err := controllers.NewGameServerController(logger, agonesClientSet)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 	stop := signals.SetupSignalHandler()
-
-	agonesController.Run(stop)
+	gameServerController.Run(stop)
 
 	logger.Info("GameServer Controller Terminated")
 }

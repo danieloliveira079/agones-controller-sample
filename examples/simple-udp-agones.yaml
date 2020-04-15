@@ -2,6 +2,7 @@ apiVersion: "agones.dev/v1"
 kind: GameServer
 metadata:
   name: "simple-udp-agones"
+  app: simple
 spec:
   ports:
     - name: default

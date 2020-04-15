@@ -190,6 +190,53 @@ Using go tools:
 $ go run cmd/controller.go --verbose --kubeconfig /Users/foo/.kube/config
 ```
 
+The expected output should be something similar to:
+```bash
+DEBU[0000] Starting GameServer Controller               
+DEBU[0000] version.BuildInfo{Version:"0f73df9", BuildTS:"2020-04-15 06:10:41", GitBranch:"master", GitCommit:"0f73df96c1fa7fb5c4bf4ca14a50ad9850cf43c3", GoVersion:"go1.14.1"} 
+```
+
+### Triggering Events
+
+Using a second shell session, deploy the `simple-udp-agones.yaml` running:
+```bash
+$ kubectl apply -f examples/simple-udp-agones.yaml
+```
+
+The expected output should be something similar to:
+```bash
+ DEBU[0041] Handled Add GameServer Event: default/simple-udp-agones - State: PortAllocation 
+ DEBU[0041] Handled Update GameServer Event: default/simple-udp-agones (Creating) - version 334893 to 334896 
+ DEBU[0041] Handled Update GameServer Event: default/simple-udp-agones (Starting) - version 334896 to 334899 
+ DEBU[0041] Handled Update GameServer Event: default/simple-udp-agones (Scheduled) - version 334899 to 334904 
+ DEBU[0045] Handled Update GameServer Event: default/simple-udp-agones - nothing changed 
+ DEBU[0050] Handled Update GameServer Event: default/simple-udp-agones (RequestReady) - version 334904 to 334922 
+ DEBU[0050] Handled Update GameServer Event: default/simple-udp-agones (Ready) - version 334922 to 334924 
+ INFO[0050] GameServer Ready default/simple-udp-agones - 172.17.0.2:7300 
+```
+
+**Update the GameServer label:**
+```bash
+$ kubectl label --overwrite gameservers.agones.dev simple-udp-agones app=simple-udp-server-v2
+```
+
+The expected output should be something similar to:
+```bash
+DEBU[0569] Handled Update GameServer Event: default/simple-udp-agones (Ready) - version 335572 to 335592 
+INFO[0569] GameServer Ready default/simple-udp-agones - 172.17.0.2:7104 
+```
+
+**Delete the GameServer running:**
+```bash
+$ kubectl delete -f examples/simple-udp-agones.yaml
+```
+
+The expected output should be something similar to:
+```bash
+DEBU[0112] Handled Update GameServer Event: default/simple-udp-agones (Ready) - version 334924 to 335004 
+DEBU[0116] Handled Delete GameServer Event: default/simple-udp-agones - 2020-04-15 20:14:31 +0200 CEST
+```
+
 ### TODO
 - [ ] Add CI
 - [ ] Add Dockerfile

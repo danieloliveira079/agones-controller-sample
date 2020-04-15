@@ -2,6 +2,10 @@
 
 This repository implements a simple controller for watching GameServers resources which have been deployed using https://agones.dev.
 
+The project has an educational purpose and its intent is purely to demonstrate and briefly explain some of the components which are required when building Kubernetes controllers.
+ 
+What differentiates this project from others found on the internet is the ability to interact with non-native Kubernetes resources. In this case those resources are [Agones GameServers](https://agones.dev/site/docs/reference/gameserver).
+
 ### What is Agones?
 [Agones](https://github.com/googleforgames/agones) is a library for hosting, running and scaling [dedicated game](https://en.wikipedia.org/wiki/Game_server#Dedicated_server) servers on [Kubernetes](https://kubernetes.io/).
 
@@ -167,7 +171,7 @@ Detailed description of the most important blocks of code can be found below:
     }
     ```
 
-### How to build and use this project?
+### How to build and run this project?
 
 You can use the `Makefile` that provides:
 - `make build`: build the controller targeting Linux platform and output the binary to `bin/agones-controller`

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/tools/cache"
+	"reflect"
 	"time"
 )
 
@@ -24,7 +25,8 @@ func NewAgonesController(logger *logrus.Entry, clientSet versioned.Interface) (*
 		logger.Fatal("controller can't be created with a nil clientSet")
 	}
 
-	agonesInformerFactory := externalversions.NewSharedInformerFactory(clientSet, time.Second*30)
+	// Create a new SharedInfomerFactory with a resync period of 15 seconds.
+	agonesInformerFactory := externalversions.NewSharedInformerFactory(clientSet, time.Second*15)
 	gameServersInformer := agonesInformerFactory.Agones().V1().GameServers()
 
 	controller := &Controller{
@@ -45,7 +47,9 @@ func (c *Controller) Run(stop <-chan struct{}) {
 			}
 		},
 		UpdateFunc: func(oldObj, newObj interface{}) {
-
+			if err := c.EventHandlerGameServerUpdate(oldObj, newObj); err != nil {
+				c.logger.WithError(err).Error("update event error")
+			}
 		},
 		DeleteFunc: func(obj interface{}) {
 
@@ -77,4 +81,46 @@ func (c *Controller) EventHandlerGameServerAdd(obj interface{}) error {
 	c.logger.Debugf("Handled Add GameServer Event: %s - State: %s", key, gameServer.Status.State)
 
 	return nil
+}
+
+func (c *Controller) EventHandlerGameServerUpdate(oldObj, newObj interface{}) error {
+	oldKey, oldGameServer, err := IsGameServerKind(oldObj)
+	if err != nil {
+		return err
+	}
+
+	newKey, newGameServer, err := IsGameServerKind(newObj)
+	if err != nil {
+		return err
+	}
+
+	// Implement your business logic here.
+	// I.e: Send a http request to the external world, modify the GameServer status or labels or even
+	// communicate with your GameServer backend
+
+	// This is just an example of how to check general changes. Generally, checks will look for differences within the
+	// resource status
+	if reflect.DeepEqual(oldGameServer, newGameServer) == false {
+		c.logger.Debugf("Handled Update GameServer Event: %s - version %s to %s", oldKey, oldGameServer.ResourceVersion, newGameServer.ResourceVersion)
+		return nil
+	}
+
+	c.logger.Debugf("Handled Update GameServer Event: %s - nothing changed", newKey)
+
+	return nil
+}
+
+func IsGameServerKind(obj interface{}) (string, *agonesv1.GameServer, error) {
+	var key string
+	var err error
+
+	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
+		return key, nil, err
+	}
+
+	if _, ok := obj.(*agonesv1.GameServer); !ok {
+		return key, nil, fmt.Errorf("object is not of type %T", &agonesv1.GameServer{})
+	}
+
+	return key, obj.(*agonesv1.GameServer), nil
 }

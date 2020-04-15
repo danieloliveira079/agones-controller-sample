@@ -33,19 +33,19 @@ GOTEST   := $(GO) test -gcflags='-l' -p 3
 FILES    := $(shell find internal cmd -name '*.go' -type f -not -name '*.pb.go' -not -name '*_generated.go' -not -name '*_test.go')
 TESTS    := $(shell find internal cmd -name '*.go' -type f -not -name '*.pb.go' -not -name '*_generated.go' -name '*_test.go')
 
-CONTROLLER_BIN := bin/agones-controller
+CONTROLLER_BIN := bin/agones-controller-sample
 
 default: clean build
 
 build: $(CONTROLLER_BIN)
 
-$(CONTROLLER_BIN):
+$(CONTROLLER_BIN): clean test
 	CGO_ENABLED=0 GOOS=linux go build -ldflags '$(LDFLAGS)' -o $(CONTROLLER_BIN) $(PKG_NAME)/cmd
 
 dist: clean
 	CGO_ENABLED=0 GOOS=darwin go build -ldflags '$(LDFLAGS)' -a -installsuffix cgo -o $(CONTROLLER_BIN)-darwin $(PKG_NAME)/cmd
+	CGO_ENABLED=0 GOOS=linux go build -ldflags '$(LDFLAGS)' -a -installsuffix cgo -o $(CONTROLLER_BIN) $(PKG_NAME)/cmd
 	# Not tested on the platforms below
-	#CGO_ENABLED=0 GOOS=linux go build -ldflags '$(LDFLAGS)' -a -installsuffix cgo -o $(CONTROLLER_BIN) $(PKG_NAME)/cmd
 	# CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags '$(LDFLAGS)' -a -installsuffix cgo -o $(CONTROLLER_BIN).exe $(PKG_NAME)/cmd
 	#CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 go build -ldflags '$(LDFLAGS)' -a -installsuffix cgo -o $(CONTROLLER_BIN)-armhf $(PKG_NAME)/cmd
 	#CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags '$(LDFLAGS)' -a -installsuffix cgo -o $(CONTROLLER_BIN)-arm64 $(PKG_NAME)/cmd

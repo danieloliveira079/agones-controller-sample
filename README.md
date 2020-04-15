@@ -191,6 +191,7 @@ $ go run cmd/controller.go --verbose --kubeconfig /Users/foo/.kube/config
 ```
 
 ### TODO
+- [ ] Add CI
 - [ ] Add Dockerfile
 - [ ] Push to a Docker Hub repo
 - [ ] Add Deployment manifests

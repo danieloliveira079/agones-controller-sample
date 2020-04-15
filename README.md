@@ -176,6 +176,16 @@ You can use the `Makefile` that provides:
 
 Feel free to explore other options available on the `Makefile`.
 
+Using the output binary:
+```bash
+$ ./bin/agones-controller-sample --verbose --kubeconfig /Users/foo/.kube/config
+```
+
+Using go tools:
+```bash
+$ go run cmd/controller.go --verbose --kubeconfig /Users/foo/.kube/config
+```
+
 ### TODO
 - [ ] Add Dockerfile
 - [ ] Push to a Docker Hub repo

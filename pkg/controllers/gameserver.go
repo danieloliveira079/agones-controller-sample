@@ -8,6 +8,7 @@ import (
 	listersv1 "agones.dev/agones/pkg/client/listers/agones/v1"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 	"reflect"
 	"time"
@@ -64,7 +65,7 @@ func (c *Controller) Run(stop <-chan struct{}) {
 		},
 	})
 
-	go c.informerFactory.Start(stop)
+	c.informerFactory.Start(wait.NeverStop)
 
 	<-stop
 	c.logger.Info("Stopping GameServer Controller")

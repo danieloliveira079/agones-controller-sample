@@ -25,8 +25,10 @@ func NewAgonesController(logger *logrus.Entry, clientSet versioned.Interface) (*
 		logger.Fatal("controller can't be created with a nil clientSet")
 	}
 
-	// Create a new SharedInfomerFactory with a resync period of 15 seconds.
+	// Create a new SharedInformerFactory with a re-sync period of 15 seconds.
 	agonesInformerFactory := externalversions.NewSharedInformerFactory(clientSet, time.Second*15)
+
+	// Same approach can be used for other types of informers like: GameServerSets and Fleets
 	gameServersInformer := agonesInformerFactory.Agones().V1().GameServers()
 
 	controller := &Controller{
@@ -52,7 +54,9 @@ func (c *Controller) Run(stop <-chan struct{}) {
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
-
+			if err := c.EventHandlerGameServerDelete(obj); err != nil {
+				c.logger.WithError(err).Error("delete event error")
+			}
 		},
 	})
 
@@ -106,6 +110,23 @@ func (c *Controller) EventHandlerGameServerUpdate(oldObj, newObj interface{}) er
 	}
 
 	c.logger.Debugf("Handled Update GameServer Event: %s - nothing changed", newKey)
+
+	return nil
+}
+
+func (c *Controller) EventHandlerGameServerDelete(obj interface{}) error {
+	key, deletedGameServer, err := IsGameServerKind(obj)
+	if err != nil {
+		return err
+	}
+
+	// Implement your business logic here.
+	// I.e: Send a http request to the external world, modify the GameServer status or labels or even
+	// communicate with your GameServer backend
+
+	// This is just an example of how to check general changes. Generally, checks will look for differences within the
+	// resource status
+	c.logger.Debugf("Handled Delete GameServer Event: %s - %s", key, deletedGameServer.DeletionTimestamp.String())
 
 	return nil
 }

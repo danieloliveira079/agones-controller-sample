@@ -26,6 +26,9 @@ Requirements:
 - A Kubernetes v1.14.x cluster running Agones. Instructions can be found on https://agones.dev/site/docs/installation/creating-cluster/
 - If you are running the GameServer controller out of the cluster, make sure you are passing a valid `--kubeconfig` path as argument. Usually this file can be found at `~/.kube/config`. 
 - Go 1.14+ (possible compatible with previus versions, not tested though)
+
+Limitations
+- Not built or tested on Windows machines 
  
 ### Controller Core Components
 
@@ -45,6 +48,8 @@ Details about all these componentes can be found on https://github.com/kubernete
 - EventHandlers: Methods that will be called by the informer when a notification happens. Possible events are: Add, Update and Delete. These are the places where the business logic of your controller can be implemented. 
 
 ### Project Structure
+
+Below you can find some highlights of the GameServer controller code base which are crucial for a good understanding.   
 
 `cmd/controller.go`: Initiates the application and sets the config, the agones clientset and creates the GameServer controller.
 
@@ -161,3 +166,25 @@ Detailed description of the most important blocks of code can be found below:
         return nil
     }
     ```
+
+### How to build and use this project?
+
+You can use the `Makefile` that provides:
+- `make build`: build the controller targeting Linux platform and output the binary to `bin/agones-controller`
+- `make test`: run all the project's tests
+- `make dist`: build the controller for multiple platforms, including: Linux and Darwin. Binaries will be output to the `bin/` folder
+
+Feel free to explore other options available on the `Makefile`.
+
+### TODO
+- [ ] Add Dockerfile
+- [ ] Push to a Docker Hub repo
+- [ ] Add Deployment manifests
+- [ ] Add RBAC example required to run the GameServer controller
+- [ ] More test coverage
+- [ ] Use fake client for testing
+- [ ] Add an example using workqueue and lister
+- [ ] Upgrade to Agones 1.5
+- [ ] Add examples using filtered informers
+- [ ] Add examples using listers with filtered getOptions
+- [ ] Add communication with the external world. Request a remote endpoint.  

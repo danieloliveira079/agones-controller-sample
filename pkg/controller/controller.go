@@ -13,9 +13,10 @@ import (
 )
 
 type Controller struct {
-	logger   *logrus.Entry
-	informer informersv1.GameServerInformer
-	lister   listersv1.GameServerLister
+	logger              *logrus.Entry
+	informerFactory     externalversions.SharedInformerFactory
+	gameServersInformer informersv1.GameServerInformer
+	gameServersLister   listersv1.GameServerLister
 }
 
 func NewAgonesController(logger *logrus.Entry, clientSet versioned.Interface) (*Controller, error) {
@@ -24,19 +25,20 @@ func NewAgonesController(logger *logrus.Entry, clientSet versioned.Interface) (*
 	}
 
 	agonesInformerFactory := externalversions.NewSharedInformerFactory(clientSet, time.Second*30)
+	gameServersInformer := agonesInformerFactory.Agones().V1().GameServers()
 
-	gameServers := agonesInformerFactory.Agones().V1().GameServers()
 	controller := &Controller{
-		logger:   logger,
-		informer: gameServers,
-		lister:   gameServers.Lister(),
+		logger:              logger,
+		informerFactory:     agonesInformerFactory,
+		gameServersInformer: gameServersInformer,
+		gameServersLister:   gameServersInformer.Lister(),
 	}
 
 	return controller, nil
 }
 
 func (c *Controller) Run(stop <-chan struct{}) {
-	c.informer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	c.gameServersInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			if err := c.EventHandlerGameServerAdd(obj); err != nil {
 				c.logger.WithError(err).Error("add event error")
@@ -50,6 +52,10 @@ func (c *Controller) Run(stop <-chan struct{}) {
 		},
 	})
 
+	go c.informerFactory.Start(stop)
+
+	<-stop
+	c.logger.Info("Stopping Agones Controller")
 }
 
 func (c *Controller) EventHandlerGameServerAdd(obj interface{}) error {
@@ -68,7 +74,7 @@ func (c *Controller) EventHandlerGameServerAdd(obj interface{}) error {
 
 	// Implement your business logic here.
 	// I.e: Send a http request to the external world, modify the gameserver status or labels, etc
-	c.logger.Debugf("Handled GameServer %s - %s", key, gameServer.Status.State)
+	c.logger.Debugf("Handled Add GameServer Event: %s - State: %s", key, gameServer.Status.State)
 
 	return nil
 }

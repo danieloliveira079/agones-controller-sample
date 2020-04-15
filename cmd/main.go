@@ -46,9 +46,10 @@ func main() {
 	}
 
 	stop := signals.SetupSignalHandler()
+
 	agonesController.Run(stop)
 
-	<-stop
+	logger.Info("Agones Controller Terminated")
 }
 
 func NewLoggerWithLevel(level logrus.Level) *logrus.Entry {

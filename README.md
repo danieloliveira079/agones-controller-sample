@@ -123,3 +123,41 @@ Detailed description of the most important blocks of code can be found below:
     // start the informer to receive events notifications 	 
     c.informerFactory.Start(wait.NeverStop)
     ```
+    - Example using Update event handler
+    ```go
+    // EventHandlerGameServerUpdate handles events triggered due to a resource being updated.
+    // That includes chances caused by either the Kubernetes controller manager or any other external actor modifying the
+    // resource. I.e.: Another GameServer controller.
+    func (c *Controller) EventHandlerGameServerUpdate(oldObj, newObj interface{}) error {
+        oldKey, oldGameServer, err := IsGameServerKind(oldObj)
+        if err != nil {
+            return err
+        }
+    
+        newKey, newGameServer, err := IsGameServerKind(newObj)
+        if err != nil {
+            return err
+        }
+    
+        // Implement your business logic here.
+        // I.e: Send a http request to the external world, modify the GameServer status or labels or even
+        // communicate with your GameServer backend
+    
+        // This is just an example of how to check general changes. Generally, checks will look for differences within the
+        // resource status
+        if reflect.DeepEqual(oldGameServer, newGameServer) == false {
+            c.logger.Debugf("Handled Update GameServer Event: %s (%s) - version %s to %s", oldKey, newGameServer.Status.State, oldGameServer.ResourceVersion, newGameServer.ResourceVersion)
+    
+            // Both properties from the old and the new GameServer can be accessed. Not only Status.
+            if newGameServer.Status.State == agonesv1.GameServerStateReady && newGameServer.DeletionTimestamp.IsZero() {
+                c.logger.Infof("GameServer Ready %s - %s:%d", newKey, newGameServer.Status.Address, newGameServer.Status.Ports[0].Port)
+            }
+    
+            return nil
+        }
+    
+        c.logger.Debugf("Handled Update GameServer Event: %s - nothing changed", newKey)
+    
+        return nil
+    }
+    ```

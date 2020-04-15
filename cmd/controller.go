@@ -3,8 +3,11 @@ package main
 import (
 	agonesv1 "agones.dev/agones/pkg/client/clientset/versioned"
 	"flag"
-	"github.com/danieloliveira079/howto-agones-informers/pkg/controller"
-	"github.com/danieloliveira079/howto-agones-informers/pkg/signals"
+	"fmt"
+	"github.com/danieloliveira079/agones-controller-sample/internal/version"
+	"github.com/danieloliveira079/agones-controller-sample/pkg/controller"
+	"github.com/danieloliveira079/agones-controller-sample/pkg/log"
+	"github.com/danieloliveira079/agones-controller-sample/pkg/signals"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -22,9 +25,10 @@ func main() {
 		loglevel = logrus.DebugLevel
 	}
 
-	logger := NewLoggerWithLevel(loglevel)
+	logger := log.NewLoggerWithLevel(loglevel)
 
 	logger.Debug("Starting GameServer Controller")
+	logger.Debugf(fmt.Sprintf("%#v", (version.Info())))
 
 	// The account from the Kubeconfig must have the right RBAC configurations.
 	// TODO provide examples of RBAC or point to Agones Docs
@@ -50,14 +54,6 @@ func main() {
 	agonesController.Run(stop)
 
 	logger.Info("GameServer Controller Terminated")
-}
-
-func NewLoggerWithLevel(level logrus.Level) *logrus.Entry {
-	log := logrus.New()
-	if verbose {
-		log.SetLevel(level)
-	}
-	return logrus.NewEntry(log)
 }
 
 func init() {

@@ -101,7 +101,12 @@ func (c *Controller) EventHandlerGameServerUpdate(oldObj, newObj interface{}) er
 	// This is just an example of how to check general changes. Generally, checks will look for differences within the
 	// resource status
 	if reflect.DeepEqual(oldGameServer, newGameServer) == false {
-		c.logger.Debugf("Handled Update GameServer Event: %s - version %s to %s", oldKey, oldGameServer.ResourceVersion, newGameServer.ResourceVersion)
+		c.logger.Debugf("Handled Update GameServer Event: %s (%s) - version %s to %s", oldKey, newGameServer.Status.State, oldGameServer.ResourceVersion, newGameServer.ResourceVersion)
+
+		if newGameServer.Status.State == agonesv1.GameServerStateReady && newGameServer.DeletionTimestamp.IsZero() {
+			c.logger.Infof("GameServer Ready %s - %s:%d", newKey, newGameServer.Status.Address, newGameServer.Status.Ports[0].Port)
+		}
+
 		return nil
 	}
 

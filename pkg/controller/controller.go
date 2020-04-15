@@ -25,8 +25,10 @@ func NewAgonesController(logger *logrus.Entry, clientSet versioned.Interface) (*
 		logger.Fatal("controller can't be created with a nil clientSet")
 	}
 
-	// Create a new SharedInfomerFactory with a resync period of 15 seconds.
+	// Create a new SharedInformerFactory with a re-sync period of 15 seconds.
 	agonesInformerFactory := externalversions.NewSharedInformerFactory(clientSet, time.Second*15)
+
+	// Same approach can be used for other types of informers like: GameServerSets and Fleets
 	gameServersInformer := agonesInformerFactory.Agones().V1().GameServers()
 
 	controller := &Controller{

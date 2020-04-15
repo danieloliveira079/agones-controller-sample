@@ -1,4 +1,4 @@
-package controller
+package controllers
 
 import (
 	agonesv1 "agones.dev/agones/pkg/apis/agones/v1"
@@ -20,8 +20,8 @@ type Controller struct {
 	gameServersLister   listersv1.GameServerLister
 }
 
-// NewAgonesController returns a new Controller with informer and lister set. It requires a not nil Agones clientset.
-func NewAgonesController(logger *logrus.Entry, clientSet versioned.Interface) (*Controller, error) {
+// NewGameServerController returns a new Controller with informer and lister set. It requires a not nil Agones clientset.
+func NewGameServerController(logger *logrus.Entry, clientSet versioned.Interface) (*Controller, error) {
 	if clientSet == nil {
 		logger.Fatal("controller can't be created with a nil clientSet")
 	}

@@ -67,22 +67,18 @@ func (c *Controller) Run(stop <-chan struct{}) {
 }
 
 func (c *Controller) EventHandlerGameServerAdd(obj interface{}) error {
-	var key string
-	var err error
-
-	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
+	key, addedGameServer, err := IsGameServerKind(obj)
+	if err != nil {
 		return err
 	}
 
-	if _, ok := obj.(*agonesv1.GameServer); !ok {
-		return fmt.Errorf("object is not of type %T", &agonesv1.GameServer{})
-	}
-
-	gameServer := obj.(*agonesv1.GameServer)
-
 	// Implement your business logic here.
-	// I.e: Send a http request to the external world, modify the gameserver status or labels, etc
-	c.logger.Debugf("Handled Add GameServer Event: %s - State: %s", key, gameServer.Status.State)
+	// I.e: Send a http request to the external world, modify the GameServer status or labels or even
+	// communicate with your GameServer backend
+
+	// This is just an example of how to check general changes. Generally, checks will look for differences within the
+	// resource status
+	c.logger.Debugf("Handled Add GameServer Event: %s - State: %s", key, addedGameServer.Status.State)
 
 	return nil
 }

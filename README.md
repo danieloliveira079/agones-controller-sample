@@ -88,3 +88,38 @@ Detailed description of the most important blocks of code can be found below:
         // Same approach can be used for other types of informers like: GameServerSets and Fleets
         gameServersInformer := agonesInformerFactory.Agones().V1().GameServers()
         ```
+    - Get the GameServer lister from the SharedInformer
+        ```go
+        controller := &Controller{
+                logger:              logger,
+                informerFactory:     agonesInformerFactory,
+                gameServersInformer: gameServersInformer,
+                // the lister is used for Create, Update and Delete operations
+                gameServersLister:   gameServersInformer.Lister(),
+            }
+        ```
+    - Add EventHandlers and Start the informer
+    ```go
+    // Alternatively, you could set any method that contains the right signature for the event
+    // I.e.: AddFunc: c.EventHandlerAdd,
+    c.gameServersInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			if err := c.EventHandlerGameServerAdd(obj); err != nil {
+				c.logger.WithError(err).Error("add event error")
+			}
+		},
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			if err := c.EventHandlerGameServerUpdate(oldObj, newObj); err != nil {
+				c.logger.WithError(err).Error("update event error")
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			if err := c.EventHandlerGameServerDelete(obj); err != nil {
+				c.logger.WithError(err).Error("delete event error")
+			}
+		},
+	})
+
+    // start the informer to receive events notifications 	 
+    c.informerFactory.Start(wait.NeverStop)
+    ```

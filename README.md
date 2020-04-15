@@ -1,1 +1,1 @@
-howto-agones-informers
+agones-controller-sample

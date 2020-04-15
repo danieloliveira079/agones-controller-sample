@@ -1,4 +1,4 @@
-module github.com/danieloliveira079/howto-agones-informers
+module github.com/danieloliveira079/agones-controller-sample
 
 go 1.14
 

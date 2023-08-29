@@ -1,15 +1,17 @@
 package main
 
 import (
-	agonesv1 "agones.dev/agones/pkg/client/clientset/versioned"
 	"flag"
 	"fmt"
+
+	agonesv1 "agones.dev/agones/pkg/client/clientset/versioned"
+	"github.com/sirupsen/logrus"
+	"k8s.io/client-go/tools/clientcmd"
+
 	"github.com/danieloliveira079/agones-controller-sample/internal/version"
 	"github.com/danieloliveira079/agones-controller-sample/pkg/controllers"
 	"github.com/danieloliveira079/agones-controller-sample/pkg/log"
 	"github.com/danieloliveira079/agones-controller-sample/pkg/signals"
-	"github.com/sirupsen/logrus"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (

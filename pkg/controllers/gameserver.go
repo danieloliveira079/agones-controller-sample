@@ -1,17 +1,18 @@
 package controllers
 
 import (
+	"fmt"
+	"reflect"
+	"time"
+
 	agonesv1 "agones.dev/agones/pkg/apis/agones/v1"
 	"agones.dev/agones/pkg/client/clientset/versioned"
 	"agones.dev/agones/pkg/client/informers/externalversions"
 	informersv1 "agones.dev/agones/pkg/client/informers/externalversions/agones/v1"
 	listersv1 "agones.dev/agones/pkg/client/listers/agones/v1"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
-	"reflect"
-	"time"
 )
 
 type Controller struct {
